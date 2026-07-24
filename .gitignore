@@ -49,3 +49,5 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+cp3_auxiliary_files/
+barista_robot_description/barista_robot_drawing.png
