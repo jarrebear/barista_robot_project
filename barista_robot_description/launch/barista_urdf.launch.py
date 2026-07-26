@@ -208,6 +208,28 @@ def generate_launch_description():
             arguments=['-d', rviz_config_dir])
 
     # --------------------------------------------------
+    # ROS Gazebo Bridge
+    # --------------------------------------------------
+
+    gz_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        name="gz_bridge",
+        arguments=[
+            "/clock" + "@rosgraph_msgs/msg/Clock" + "[gz.msgs.Clock",
+            "/cmd_vel" + "@geometry_msgs/msg/Twist" + "@gz.msgs.Twist",
+            "/tf" + "@tf2_msgs/msg/TFMessage" + "[gz.msgs.Pose_V",
+            "/odom" + "@nav_msgs/msg/Odometry" + "[gz.msgs.Odometry",
+            "/world/demo/model/barista_robot/joint_state" + "@sensor_msgs/msg/JointState" + "[gz.msgs.Model",
+            # "/laser_scan" + "@sensor_msgs/msg/LaserScan" + "[gz.msgs.LaserScan",
+        ],
+        remappings=[
+            ("/world/demo/model/barista_robot/joint_state", "/joint_states"),
+        ],
+        output="screen",
+    )
+
+    # --------------------------------------------------
     # Launch description
     # --------------------------------------------------
 
@@ -237,6 +259,9 @@ def generate_launch_description():
             
             # Load rviz
             rviz_node,
+
+            # Gazebo bridge
+            gz_bridge
 
         ]
     )

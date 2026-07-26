@@ -56,7 +56,7 @@
   <!-- Wheel Left -->
   <link name="left_wheel">      
       <visual>
-        <origin rpy="0 1.5707 0" xyz="0 0 0"/>
+        <origin rpy="1.5707 1.5707 0" xyz="0 0 0"/>
         <geometry>
           <cylinder length="0.0206" radius="0.0352"/>
         </geometry>
@@ -64,25 +64,44 @@
       </visual>
 
       <collision>
-        <origin rpy="0 1.5707 0" xyz="0 0 0"/>
+        <origin rpy="1.5707 1.5707 0" xyz="0 0 0"/>
         <geometry>
           <cylinder length="0.0206" radius="0.0352"/>
         </geometry>
       </collision>
 
       <inertial>
-        <origin rpy="0 1.5707 0" xyz="0 0 0"/>
+        <origin rpy="1.5707 1.5707 0" xyz="0 0 0"/>
         <mass value="0.05"/>
         <inertia ixx="0.00001725617" ixy="0" ixz="0" iyy="0.00001725617" iyz="0" izz="0.000030976"/>
       </inertial>
 
   </link>
 
+  <gazebo reference="left_wheel">
+    <collision>
+        <surface>
+        <friction>
+            <ode>
+            <mu>10.0</mu>
+            <mu2>10.0</mu2>
+            </ode>
+        </friction>
+        <contact>
+            <ode>
+            <kp>10000000.0</kp>
+            <kd>10000000.0</kd>
+            </ode>
+        </contact>
+        </surface>
+    </collision>
+  </gazebo>
+
   <joint name="joint_left_wheel" type="continuous">
-    <origin rpy="0 0 0" xyz="0.158 0 -0.0775"/>
+    <origin rpy="0 0 0" xyz="0 0.158 -0.0775"/>
     <child link="left_wheel"/>
     <parent link="main_body"/>
-    <axis rpy="0 0 0" xyz="1 0 0"/>
+    <axis rpy="0 0 0" xyz="0 1 0"/>
     <limit effort="10000" velocity="1000"/>
     <joint_properties damping="1.0" friction="1.0"/>
   </joint>
@@ -90,7 +109,7 @@
   <!-- Wheel Right -->
   <link name="right_wheel">      
       <visual>
-        <origin rpy="0 1.5707 0" xyz="0 0 0"/>
+        <origin rpy="1.5707 1.5707 0" xyz="0 0 0"/>
         <geometry>
           <cylinder length="0.0206" radius="0.0352"/>
         </geometry>
@@ -98,29 +117,47 @@
       </visual>
 
       <collision>
-        <origin rpy="0 1.5707 0" xyz="0 0 0"/>
+        <origin rpy="1.5707 1.5707 0" xyz="0 0 0"/>
         <geometry>
           <cylinder length="0.0206" radius="0.0352"/>
         </geometry>
       </collision>
 
       <inertial>
-        <origin rpy="0 1.5707 0" xyz="0 0 0"/>
+        <origin rpy="1.5707 1.5707 0" xyz="0 0 0"/>
         <mass value="0.05"/>
         <inertia ixx="0.00001725617" ixy="0" ixz="0" iyy="0.00001725617" iyz="0" izz="0.000030976"/>
       </inertial>
 
   </link>
 
+  <gazebo reference="right_wheel">
+    <collision>
+        <surface>
+        <friction>
+            <ode>
+            <mu>10.0</mu>
+            <mu2>10.0</mu2>
+            </ode>
+        </friction>
+        <contact>
+            <ode>
+            <kp>10000000.0</kp>
+            <kd>10000000.0</kd>
+            </ode>
+        </contact>
+        </surface>
+    </collision>
+  </gazebo>
+
   <joint name="joint_right_wheel" type="continuous">
-    <origin rpy="0 0 0" xyz="-0.158 0 -0.0775"/>
+    <origin rpy="0 0 0" xyz="0 -0.158 -0.0775"/>
     <child link="right_wheel"/>
     <parent link="main_body"/>
-    <axis rpy="0 0 0" xyz="1 0 0"/>
+    <axis rpy="0 0 0" xyz="0 1 0"/>
     <limit effort="10000" velocity="1000"/>
     <joint_properties damping="1.0" friction="1.0"/>
   </joint>
-
 
   <!-- Caster Wheel Front -->
   <link name="front_yaw_link">
@@ -148,7 +185,7 @@
   </link>
 
   <joint name="front_yaw_joint" type="continuous">
-    <origin rpy="0 0 0" xyz="0 0.138 -0.0775" />
+    <origin rpy="0 0 0" xyz="0.138 0 -0.0775" />
     <parent link="main_body" />
     <child link="front_yaw_link" />
     <axis xyz="0 0 1" />
@@ -194,7 +231,7 @@
       <geometry>
         <sphere radius="0.0352"/>
       </geometry>
-      <material name="green_dark"/>
+      <material name="red"/>
     </visual>
 
     <collision>
@@ -211,7 +248,7 @@
     </inertial>
   </link>
 
-  <!-- <gazebo reference="front_pitch_link">
+  <gazebo reference="front_pitch_link">
     <collision>
         <surface>
         <friction>
@@ -228,7 +265,7 @@
         </contact>
         </surface>
     </collision>
-  </gazebo> -->
+  </gazebo>
 
   <joint name="front_pitch_joint" type="continuous">
     <origin rpy="0 0 0" xyz="0 0 0" />
@@ -265,7 +302,7 @@
   </link>
 
   <joint name="rear_yaw_joint" type="continuous">
-    <origin rpy="0 0 0" xyz="0 -0.138 -0.0775" />
+    <origin rpy="0 0 0" xyz="-0.138 0 -0.0775" />
     <parent link="main_body" />
     <child link="rear_yaw_link" />
     <axis xyz="0 0 1" />
@@ -328,7 +365,7 @@
     </inertial>
   </link>
 
-  <!-- <gazebo reference="rear_pitch_link">
+  <gazebo reference="rear_pitch_link">
     <collision>
         <surface>
         <friction>
@@ -345,7 +382,7 @@
         </contact>
         </surface>
     </collision>
-  </gazebo> -->
+  </gazebo>
 
   <joint name="rear_pitch_joint" type="continuous">
     <origin rpy="0 0 0" xyz="0 0 0" />
@@ -355,5 +392,32 @@
     <limit effort="1000.0" velocity="100.0" />
     <dynamics damping="0.0" friction="0.1"/>
   </joint>
+
+
+  <!-- Differential Drive Plugin -->
+  <gazebo>
+    <plugin
+        filename="gz-sim-diff-drive-system"
+        name="gz::sim::systems::DiffDrive">
+        <left_joint>joint_left_wheel</left_joint>
+        <right_joint>joint_right_wheel</right_joint>
+        <wheel_separation>0.316</wheel_separation>
+        <wheel_radius>0.0352</wheel_radius>
+        <topic>cmd_vel</topic>
+        <publish_odom>true</publish_odom>
+        <publish_odom_tf>true</publish_odom_tf>
+        <publish_wheel_tf>true</publish_wheel_tf>
+        <odom_topic>odom</odom_topic>
+        <tf_topic>tf</tf_topic>
+        <frame_id>odom</frame_id>
+        <child_frame_id>base_link</child_frame_id>
+    </plugin>
+  </gazebo>
+
+  <gazebo>
+    <plugin filename="gz-sim-joint-state-publisher-system"
+            name="gz::sim::systems::JointStatePublisher">
+    </plugin>
+  </gazebo>
 
 </robot>
