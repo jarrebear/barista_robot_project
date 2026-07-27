@@ -2,7 +2,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <xacro:include filename="$(find barista_robot_description)/xacro/inertia_calculations.xacro"/>
-  <xacro:macro name="caster_wheel_macro" params="caster_wheel_name radius caster_color">
+  <xacro:macro name="caster_wheel_macro" params="caster_wheel_name parent_link joint_xyz radius caster_color">
 
     <link name="${caster_wheel_name}_yaw_link">
         <visual>
@@ -27,6 +27,15 @@
         rpy="0 1.5707 1.5707"/>
 
     </link>
+
+    <joint name="${caster_wheel_name}_yaw_joint" type="continuous">
+        <origin rpy="0 0 0" xyz="${joint_xyz}" />
+        <parent link="${parent_link}" />
+        <child link="${caster_wheel_name}_yaw_link" />
+        <axis xyz="0 0 1" />
+        <limit effort="1000.0" velocity="100.0" />
+        <dynamics damping="0.0" friction="0.1"/>
+    </joint>
 
     <link name="${caster_wheel_name}_roll_link">
         <visual>

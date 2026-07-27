@@ -70,16 +70,17 @@
       radius="${wheel_radius}"
       length="${wheel_width}"
       mass="${wheel_mass}"
-      rpy="${wheel_rpy}"/>
-
-  <joint name="joint_left_wheel" type="continuous">
+      rpy="${wheel_rpy}"
+      parent_link="main_body"
+      joint_xyz="0 0.158 -0.0775"/>
+  <!-- <joint name="joint_left_wheel" type="continuous">
     <origin rpy="0 0 0" xyz="0 0.158 -0.0775"/>
     <child link="left_wheel"/>
     <parent link="main_body"/>
     <axis rpy="0 0 0" xyz="0 1 0"/>
     <limit effort="10000" velocity="1000"/>
     <joint_properties damping="1.0" friction="1.0"/>
-  </joint>
+  </joint> -->
 
   <!-- Right Wheel -->
   <xacro:wheel_macro
@@ -87,46 +88,52 @@
       radius="${wheel_radius}"
       length="${wheel_width}"
       mass="${wheel_mass}"
-      rpy="${wheel_rpy}"/>
+      rpy="${wheel_rpy}"
+      parent_link="main_body"
+      joint_xyz="0 -0.158 -0.0775"/>
 
-  <joint name="joint_right_wheel" type="continuous">
+  <!-- <joint name="joint_right_wheel" type="continuous">
     <origin rpy="0 0 0" xyz="0 -0.158 -0.0775"/>
     <child link="right_wheel"/>
     <parent link="main_body"/>
     <axis rpy="0 0 0" xyz="0 1 0"/>
     <limit effort="10000" velocity="1000"/>
     <joint_properties damping="1.0" friction="1.0"/>
-  </joint>
+  </joint> -->
 
   <!-- Front Caster Wheel -->
   <xacro:caster_wheel_macro
       caster_wheel_name="front"
       radius="${wheel_radius}"
-      caster_color="red"/>
+      caster_color="red"
+      parent_link="main_body"
+      joint_xyz="0.138 0 -0.0775"/>
 
-    <joint name="front_yaw_joint" type="continuous">
+    <!-- <joint name="front_yaw_joint" type="continuous">
         <origin rpy="0 0 0" xyz="0.138 0 -0.0775" />
         <parent link="main_body" />
         <child link="front_yaw_link" />
         <axis xyz="0 0 1" />
         <limit effort="1000.0" velocity="100.0" />
         <dynamics damping="0.0" friction="0.1"/>
-    </joint>
+    </joint> -->
 
   <!-- Rear Caster Wheel -->
   <xacro:caster_wheel_macro
       caster_wheel_name="rear"
       radius="${wheel_radius}"
-      caster_color="green_dark"/>
+      caster_color="green_dark"
+      parent_link="main_body"
+      joint_xyz="-0.138 0 -0.0775"/>
 
-  <joint name="rear_yaw_joint" type="continuous">
+  <!-- <joint name="rear_yaw_joint" type="continuous">
     <origin rpy="0 0 0" xyz="-0.138 0 -0.0775" />
     <parent link="main_body" />
     <child link="rear_yaw_link" />
     <axis xyz="0 0 1" />
     <limit effort="1000.0" velocity="100.0" />
     <dynamics damping="0.0" friction="0.1"/>
-  </joint>
+  </joint> -->
 
   <!-- Differential Drive Plugin -->
   <gazebo>

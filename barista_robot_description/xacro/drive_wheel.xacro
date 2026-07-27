@@ -3,7 +3,7 @@
 
   <xacro:include filename="$(find barista_robot_description)/xacro/inertia_calculations.xacro"/>
 
-  <xacro:macro name="wheel_macro" params="wheel_name radius length mass xyz:='0 0 0' rpy:='0 0 0'">
+  <xacro:macro name="wheel_macro" params="wheel_name parent_link joint_xyz radius length mass xyz:='0 0 0' rpy:='0 0 0'">
     <link name="${wheel_name}">      
         <visual>
             <origin rpy="${rpy}" xyz="${xyz}"/>
@@ -26,6 +26,15 @@
       length="${length}"/>
 
     </link>
+
+  <joint name="joint_${wheel_name}" type="continuous">
+    <origin rpy="0 0 0" xyz="${joint_xyz}"/>
+    <child link="${wheel_name}"/>
+    <parent link="${parent_link}"/>
+    <axis rpy="0 0 0" xyz="0 1 0"/>
+    <limit effort="10000" velocity="1000"/>
+    <joint_properties damping="1.0" friction="1.0"/>
+  </joint>
 
     <gazebo reference="${wheel_name}">
         <collision>
