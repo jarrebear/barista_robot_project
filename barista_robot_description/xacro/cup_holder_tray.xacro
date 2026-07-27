@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find barista_robot_description)/xacro/inertia_calculations.xacro"/>
+
+  <xacro:macro name="cupholder_tray_macro" params="parent_link joint_xyz length radius mass">
+
+    <link name="cupholder_tray_link">
+    <visual>
+        <geometry>
+        <cylinder length="${length}" radius="${radius}"/>
+        </geometry>
+        <material name="blue"/>
+    </visual>
+
+    <collision>
+        <geometry>
+        <cylinder length="${length}" radius="${radius}"/>
+        </geometry>
+    </collision>
+
+    <xacro:cylinder_inertia
+      mass="${mass}"
+      radius="${radius}"
+      length="${length}"/>
+
+    </link>
+
+    <joint name="cupholder_tray_link_joint" type="fixed">
+    <origin rpy="0 0 0" xyz= "${joint_xyz}" />
+    <parent link="${parent_link}" />
+    <child link="cupholder_tray_link" />
+    </joint>
+
+  </xacro:macro>
+
+</robot>

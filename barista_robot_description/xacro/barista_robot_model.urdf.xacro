@@ -4,6 +4,8 @@
   <xacro:include filename="$(find barista_robot_description)/xacro/inertia_calculations.xacro"/>
   <xacro:include filename="$(find barista_robot_description)/xacro/drive_wheel.xacro" />
   <xacro:include filename="$(find barista_robot_description)/xacro/caster_wheel.xacro" />
+  <xacro:include filename="$(find barista_robot_description)/xacro/standoff_rod.xacro" />
+  <xacro:include filename="$(find barista_robot_description)/xacro/cup_holder_tray.xacro" />
 
   <xacro:property name="body_radius" value="0.178"/>
   <xacro:property name="body_height" value="0.155"/>
@@ -12,6 +14,12 @@
   <xacro:property name="wheel_radius" value="0.0352"/>
   <xacro:property name="wheel_mass" value="0.05"/>
   <xacro:property name="wheel_rpy" value="1.5707 1.5707 0"/>
+  <xacro:property name="standoff_rod_length" value="0.220"/>
+  <xacro:property name="standoff_rod_radius" value="0.01"/>
+  <xacro:property name="standoff_rod_mass" value="0.05"/>
+  <xacro:property name="cupholder_tray_length" value="0.090"/>
+  <xacro:property name="cupholder_tray_radius" value="0.160"/>
+  <xacro:property name="cupholder_tray_mass" value="0.2"/>
 
   <material name="blue">
       <color rgba="0.0 0.0 1.0 1"/>
@@ -31,6 +39,10 @@
 
   <material name="black">
       <color rgba="0.0 0.0 0.0 1"/>
+  </material>
+
+  <material name="grey">
+      <color rgba="0.5 0.5 0.5 1"/>
   </material>
 
   <link name="base_link">
@@ -73,14 +85,6 @@
       rpy="${wheel_rpy}"
       parent_link="main_body"
       joint_xyz="0 0.158 -0.0775"/>
-  <!-- <joint name="joint_left_wheel" type="continuous">
-    <origin rpy="0 0 0" xyz="0 0.158 -0.0775"/>
-    <child link="left_wheel"/>
-    <parent link="main_body"/>
-    <axis rpy="0 0 0" xyz="0 1 0"/>
-    <limit effort="10000" velocity="1000"/>
-    <joint_properties damping="1.0" friction="1.0"/>
-  </joint> -->
 
   <!-- Right Wheel -->
   <xacro:wheel_macro
@@ -92,15 +96,6 @@
       parent_link="main_body"
       joint_xyz="0 -0.158 -0.0775"/>
 
-  <!-- <joint name="joint_right_wheel" type="continuous">
-    <origin rpy="0 0 0" xyz="0 -0.158 -0.0775"/>
-    <child link="right_wheel"/>
-    <parent link="main_body"/>
-    <axis rpy="0 0 0" xyz="0 1 0"/>
-    <limit effort="10000" velocity="1000"/>
-    <joint_properties damping="1.0" friction="1.0"/>
-  </joint> -->
-
   <!-- Front Caster Wheel -->
   <xacro:caster_wheel_macro
       caster_wheel_name="front"
@@ -108,15 +103,6 @@
       caster_color="red"
       parent_link="main_body"
       joint_xyz="0.138 0 -0.0775"/>
-
-    <!-- <joint name="front_yaw_joint" type="continuous">
-        <origin rpy="0 0 0" xyz="0.138 0 -0.0775" />
-        <parent link="main_body" />
-        <child link="front_yaw_link" />
-        <axis xyz="0 0 1" />
-        <limit effort="1000.0" velocity="100.0" />
-        <dynamics damping="0.0" friction="0.1"/>
-    </joint> -->
 
   <!-- Rear Caster Wheel -->
   <xacro:caster_wheel_macro
@@ -126,14 +112,49 @@
       parent_link="main_body"
       joint_xyz="-0.138 0 -0.0775"/>
 
-  <!-- <joint name="rear_yaw_joint" type="continuous">
-    <origin rpy="0 0 0" xyz="-0.138 0 -0.0775" />
-    <parent link="main_body" />
-    <child link="rear_yaw_link" />
-    <axis xyz="0 0 1" />
-    <limit effort="1000.0" velocity="100.0" />
-    <dynamics damping="0.0" friction="0.1"/>
-  </joint> -->
+  <!-- Standoff rod 1 -->
+  <xacro:standoff_rod_macro
+      standoff_rod_name="standoff_rod_1"
+      radius="${standoff_rod_radius}"
+      length="${standoff_rod_length}"
+      mass="${standoff_rod_mass}"
+      parent_link="main_body"
+      joint_xyz="0.06 0.128 0.1875"/>
+
+  <!-- Standoff rod 2 -->
+  <xacro:standoff_rod_macro
+      standoff_rod_name="standoff_rod_2"
+      radius="${standoff_rod_radius}"
+      length="${standoff_rod_length}"
+      mass="${standoff_rod_mass}"
+      parent_link="main_body"
+      joint_xyz="-0.06 0.128 0.1875"/>
+
+  <!-- Standoff rod 3 -->
+  <xacro:standoff_rod_macro
+      standoff_rod_name="standoff_rod_3"
+      radius="${standoff_rod_radius}"
+      length="${standoff_rod_length}"
+      mass="${standoff_rod_mass}"
+      parent_link="main_body"
+      joint_xyz="0.06 -0.128 0.1875"/>
+
+  <!-- Standoff rod 4 -->
+  <xacro:standoff_rod_macro
+      standoff_rod_name="standoff_rod_4"
+      radius="${standoff_rod_radius}"
+      length="${standoff_rod_length}"
+      mass="${standoff_rod_mass}"
+      parent_link="main_body"
+      joint_xyz="-0.06 -0.128 0.1875"/>
+
+  <!-- Cupholder tray -->
+  <xacro:cupholder_tray_macro
+      radius="${cupholder_tray_radius}"
+      length="${cupholder_tray_length}"
+      mass="${cupholder_tray_mass}"
+      parent_link="main_body"
+      joint_xyz="0 0 0.3425"/>
 
   <!-- Differential Drive Plugin -->
   <gazebo>
