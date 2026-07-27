@@ -28,6 +28,7 @@ install(
     launch
 	worlds
 	rviz
+	meshes
   DESTINATION
     share/${PROJECT_NAME}/
 )

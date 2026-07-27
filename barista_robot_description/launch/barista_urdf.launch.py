@@ -221,10 +221,11 @@ def generate_launch_description():
             "/tf" + "@tf2_msgs/msg/TFMessage" + "[gz.msgs.Pose_V",
             "/odom" + "@nav_msgs/msg/Odometry" + "[gz.msgs.Odometry",
             "/world/demo/model/barista_robot/joint_state" + "@sensor_msgs/msg/JointState" + "[gz.msgs.Model",
-            # "/laser_scan" + "@sensor_msgs/msg/LaserScan" + "[gz.msgs.LaserScan",
+            "/laser_scan" + "@sensor_msgs/msg/LaserScan" + "[gz.msgs.LaserScan",
         ],
         remappings=[
             ("/world/demo/model/barista_robot/joint_state", "/joint_states"),
+            ("/laser_scan", "/scan"),
         ],
         output="screen",
     )

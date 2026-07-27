@@ -21,6 +21,11 @@
       <color rgba="1.0 1.0 0.0 1"/>
   </material>
 
+  <material name="grey">
+      <color rgba="0.5 0.5 0.5 1"/>
+  </material>
+
+
   <link name="base_link">
   </link>
 
@@ -419,5 +424,224 @@
             name="gz::sim::systems::JointStatePublisher">
     </plugin>
   </gazebo>
+
+  <!-- Standoff Rod 1 -->
+  <link name="standoff_rod_1_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.220" radius="0.01"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+    <collision>
+      <geometry>
+        <cylinder length="0.220" radius="0.01"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="0.05"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.000202917" ixy="0" ixz="0" iyy="0.000202917" iyz="0" izz="0.0000025"/>
+    </inertial>
+
+  </link>
+
+  <joint name="standoff_rod_1_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.06 0.128 0.1875" />
+    <parent link="main_body" />
+    <child link="standoff_rod_1_link" />
+  </joint>
+
+  <!-- Standoff Rod 2 -->
+  <link name="standoff_rod_2_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.220" radius="0.01"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+    <collision>
+      <geometry>
+        <cylinder length="0.220" radius="0.01"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="0.05"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.000202917" ixy="0" ixz="0" iyy="0.000202917" iyz="0" izz="0.0000025"/>
+    </inertial>
+
+  </link>
+
+  <joint name="standoff_rod_2_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="-0.06 0.128 0.1875" />
+    <parent link="main_body" />
+    <child link="standoff_rod_2_link" />
+  </joint>
+
+  <!-- Standoff Rod 3 -->
+  <link name="standoff_rod_3_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.220" radius="0.01"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+    <collision>
+      <geometry>
+        <cylinder length="0.220" radius="0.01"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="0.05"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.000202917" ixy="0" ixz="0" iyy="0.000202917" iyz="0" izz="0.0000025"/>
+    </inertial>
+
+  </link>
+
+  <joint name="standoff_rod_3_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.06 -0.128 0.1875" />
+    <parent link="main_body" />
+    <child link="standoff_rod_3_link" />
+  </joint>
+
+  <!-- Standoff Rod 4 -->
+  <link name="standoff_rod_4_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.220" radius="0.01"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+    <collision>
+      <geometry>
+        <cylinder length="0.220" radius="0.01"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="0.05"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.000202917" ixy="0" ixz="0" iyy="0.000202917" iyz="0" izz="0.0000025"/>
+    </inertial>
+
+  </link>
+
+  <joint name="standoff_rod_4_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="-0.06 -0.128 0.1875" />
+    <parent link="main_body" />
+    <child link="standoff_rod_4_link" />
+  </joint>
+
+
+  <!-- Cupholder Tray -->
+  <link name="cupholder_tray_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.090" radius="0.160"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+
+    <collision>
+      <geometry>
+        <cylinder length="0.090" radius="0.160"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="0.2"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.001415" ixy="0" ixz="0" iyy="0.001415" iyz="0" izz="0.00002"/>
+    </inertial>
+
+  </link>
+
+  <joint name="cupholder_tray_link_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.3425" />
+    <parent link="main_body" />
+    <child link="cupholder_tray_link" />
+  </joint>
+
+ <!-- Lidar -->
+  <link name="laser_scan_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://barista_robot_description/meshes/velodyne_puck.dae" scale="1 1 1"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="0.1"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="1.67e-06" ixy="0" ixz="0" iyy="1.67e-06" iyz="0" izz="1.67e-06"/>
+    </inertial>
+
+  </link>
+
+  <joint name="laser_scan_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.118 0 0.0775"  />
+    <parent link="main_body" />
+    <child link="laser_scan_link" />
+  </joint>
+
+  <link name="laser_scan_frame">
+  </link>
+
+  <joint name="laser_scan_frame_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.04"/>
+    <parent link="laser_scan_link"/>
+    <child link="laser_scan_frame"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+
+<!-- Enable Sensors in Gazebo Sim -->
+<gazebo>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+        <!-- use ogre2 if ogre v2.x is installed, otherwise use ogre -->
+        <render_engine>ogre2</render_engine>
+    </plugin>
+</gazebo>
+
+<!-- Laser Scanner Plugin -->
+<gazebo reference="laser_scan_frame">
+    <sensor type="gpu_lidar" name="gpu_lidar">
+        <pose relative_to='laser_scan_frame'>0 0 0 0 0 0</pose>
+        <gz_frame_id>laser_scan_frame</gz_frame_id>
+        <always_on>1</always_on>
+        <visualize>true</visualize>
+        <update_rate>100</update_rate>
+        <topic>laser_scan</topic>
+        <ray>
+            <scan>
+                <horizontal>
+                    <samples>200</samples>
+                    <resolution>1</resolution>
+                    <min_angle>-3.14</min_angle>
+                    <max_angle>3.14</max_angle>
+                </horizontal>
+            </scan>
+            <range>
+                <min>0.1</min>
+                <max>5.0</max>
+                <resolution>0.01</resolution>
+            </range>
+        </ray>
+    </sensor>
+</gazebo>
 
 </robot>
