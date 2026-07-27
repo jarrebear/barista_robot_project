@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find barista_robot_description)/xacro/inertia_calculations.xacro"/>
+  <xacro:macro name="caster_wheel_macro" params="caster_wheel_name radius caster_color">
+
+    <link name="${caster_wheel_name}_yaw_link">
+        <visual>
+            <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+            <geometry>          
+            <cylinder length="0.001" radius="0.0045000000000000005"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+
+        <collision>
+            <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+            <geometry>
+            <cylinder length="0.001" radius="0.0045000000000000005"/>
+            </geometry>
+        </collision>
+
+        <xacro:cylinder_inertia
+        mass="0.001"
+        radius="0.0045000000000000005"
+        length="0.001"
+        rpy="0 1.5707 1.5707"/>
+
+    </link>
+
+    <link name="${caster_wheel_name}_roll_link">
+        <visual>
+            <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+            <geometry>
+            <cylinder length="0.001" radius="0.0045000000000000005"/>
+            </geometry>
+            <material name="yellow"/>
+        </visual>
+
+        <collision>
+            <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+            <geometry>
+            <cylinder length="0.001" radius="0.0045000000000000005"/>
+            </geometry>
+        </collision>
+
+        <xacro:cylinder_inertia
+        mass="0.001"
+        radius="0.0045000000000000005"
+        length="0.001"
+        rpy="0 1.5707 1.5707"/>
+
+    </link>
+
+    <joint name="${caster_wheel_name}_roll_joint" type="continuous">
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <parent link="${caster_wheel_name}_yaw_link" />
+        <child link="${caster_wheel_name}_roll_link" />
+        <axis xyz="1 0 0" />
+        <limit effort="1000.0" velocity="100.0" />
+        <dynamics damping="0.0" friction="0.1"/>
+    </joint>
+
+    <link name="${caster_wheel_name}_pitch_link">
+        <visual>
+        <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+        <geometry>
+            <sphere radius="${radius}"/>
+        </geometry>
+        <material name="${caster_color}"/>
+        </visual>
+
+        <collision>
+        <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+        <geometry>
+            <sphere radius="${radius}"/>
+        </geometry>
+        </collision>
+
+        <xacro:sphere_inertia
+        mass="0.010"
+        radius="${radius}"
+        rpy="0 1.5707 1.5707"/>
+
+    </link>
+
+    <gazebo reference="${caster_wheel_name}_pitch_link">
+        <collision>
+            <surface>
+            <friction>
+                <ode>
+                <mu>0.5</mu>
+                <mu2>0.5</mu2>
+                </ode>
+            </friction>
+            <contact>
+                <ode>
+                <kp>10000000.0</kp>
+                <kd>10000000.0</kd>
+                </ode>
+            </contact>
+            </surface>
+        </collision>
+    </gazebo>
+
+    <joint name="${caster_wheel_name}_pitch_joint" type="continuous">
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <parent link="${caster_wheel_name}_roll_link" />
+        <child link="${caster_wheel_name}_pitch_link" />
+        <axis xyz="0 1 0" />
+        <limit effort="1000.0" velocity="100.0" />
+        <dynamics damping="0.0" friction="0.1"/>
+    </joint>
+  </xacro:macro>
+
+</robot>
