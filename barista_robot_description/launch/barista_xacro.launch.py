@@ -1,66 +1,26 @@
 import os
 from ament_index_python.packages import (get_package_prefix, get_package_share_directory)
 from launch import LaunchDescription
-from launch.actions import (DeclareLaunchArgument, IncludeLaunchDescription, TimerAction)
+from launch.actions import (DeclareLaunchArgument, IncludeLaunchDescription, TimerAction, OpaqueFunction)
 from launch.substitutions import (PathJoinSubstitution, LaunchConfiguration)
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import SetParameter, Node
+from launch.conditions import IfCondition
 
 import xacro
 
 # ROS2 Launch System will look for this function definition #
 def generate_launch_description():
 
-    # Get Package Directory #
-    pkg_barista_robot_description = get_package_share_directory('barista_robot_description')
-    gz_sim_pkg = get_package_share_directory("ros_gz_sim")
-
-    # Set the Path to Robot Mesh Models for Loading in Gazebo Sim #
-    # NOTE: Do this BEFORE launching Gazebo Sim #
-    install_dir_path_description = (get_package_prefix('barista_robot_description') + "/share")
-    # gazebo_models_path = os.path.join(pkg_box_bot_gazebo, "models")
-    description_meshes_path = os.path.join(pkg_barista_robot_description, "meshes")
-    gazebo_resource_paths = [install_dir_path_description,  description_meshes_path] #gazebo_models_path]
-    if "GZ_SIM_RESOURCE_PATH" in os.environ:
-        for resource_path in gazebo_resource_paths:
-            if resource_path not in os.environ["GZ_SIM_RESOURCE_PATH"]:
-                os.environ["GZ_SIM_RESOURCE_PATH"] += (':' + resource_path)
-    else:
-        os.environ["GZ_SIM_RESOURCE_PATH"] = (':'.join(gazebo_resource_paths))
-
     # --------------------------------------------------
-    # Launch Gazebo world
+    # Launch arguments
     # --------------------------------------------------
-    gz_sim = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(gz_sim_pkg, 'launch', 'gz_sim.launch.py')),
-            launch_arguments={'gz_args': [
-            '-r ',  # <-- start unpaused
-            PathJoinSubstitution([pkg_barista_robot_description, 'worlds', 'barista_empty.world'])
-        ]}.items(),
+
+    declare_include_laser = DeclareLaunchArgument(
+        "include_laser",
+        default_value="true",
+        description="Whether to include the laser scanner in the robot description",
     )
-
-    # convert XACRO file into URDF
-    xacro_file = os.path.join(pkg_barista_robot_description, 'xacro', 'barista_robot_model.urdf.xacro')
-    doc = xacro.parse(open(xacro_file))
-    xacro.process_doc(doc)
-    params = {'robot_description': doc.toxml()}
-
-    # --------------------------------------------------
-    # Robot State Publisher
-    # --------------------------------------------------
-
-    robot_state_publisher_node = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='robot_state_publisher_node',
-        output="screen",
-        parameters=[params]
-    )
-
-    # --------------------------------------------------
-    # Spawn arguments
-    # --------------------------------------------------
 
     declare_spawn_model_name = DeclareLaunchArgument(
         "model_name",
@@ -92,6 +52,35 @@ def generate_launch_description():
         description="Spawn yaw angle",
     )
 
+    # --------------------------------------------------
+    # Package paths and gazebo resources
+    # --------------------------------------------------
+
+    pkg_barista_robot_description = get_package_share_directory('barista_robot_description')
+    gz_sim_pkg = get_package_share_directory("ros_gz_sim")
+
+    install_dir_path_description = (get_package_prefix('barista_robot_description') + "/share")
+    description_meshes_path = os.path.join(pkg_barista_robot_description, "meshes")
+    gazebo_resource_paths = [install_dir_path_description, description_meshes_path]
+    if "GZ_SIM_RESOURCE_PATH" in os.environ:
+        for resource_path in gazebo_resource_paths:
+            if resource_path not in os.environ["GZ_SIM_RESOURCE_PATH"]:
+                os.environ["GZ_SIM_RESOURCE_PATH"] += (':' + resource_path)
+    else:
+        os.environ["GZ_SIM_RESOURCE_PATH"] = (':'.join(gazebo_resource_paths))
+
+    # --------------------------------------------------
+    # Launch Gazebo world
+    # --------------------------------------------------
+
+    gz_sim = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(gz_sim_pkg, 'launch', 'gz_sim.launch.py')),
+        launch_arguments={'gz_args': [
+            '-r ',
+            PathJoinSubstitution([pkg_barista_robot_description, 'worlds', 'barista_empty.world'])
+        ]}.items(),
+    )
 
     # --------------------------------------------------
     # Spawn robot into Gazebo
@@ -103,53 +92,38 @@ def generate_launch_description():
         name="barista_robot_spawn",
         output="screen",
         arguments=[
-            "-name",
-            LaunchConfiguration("model_name"),
-
-            "-allow_renaming",
-            "true",
-
-            "-topic",
-            "robot_description",
-
-            "-x",
-            LaunchConfiguration("x"),
-
-            "-y",
-            LaunchConfiguration("y"),
-
-            "-z",
-            LaunchConfiguration("z"),
-
-            "-Y",
-            LaunchConfiguration("yaw"),
+            "-name", LaunchConfiguration("model_name"),
+            "-allow_renaming", "true",
+            "-topic", "robot_description",
+            "-x", LaunchConfiguration("x"),
+            "-y", LaunchConfiguration("y"),
+            "-z", LaunchConfiguration("z"),
+            "-Y", LaunchConfiguration("yaw"),
         ],
     )
 
-
-    # Delay spawn until Gazebo is running
     delayed_spawn = TimerAction(
         period=2.0,
-        actions=[
-            gz_spawn_entity
-        ],
+        actions=[gz_spawn_entity]
     )
 
+    # --------------------------------------------------
+    # RVIZ
+    # --------------------------------------------------
 
-    # RVIZ Configuration
     rviz_config_dir = os.path.join(
         pkg_barista_robot_description,
         "rviz",
         "urdf_vis.rviz"
-        )
+    )
 
     rviz_node = Node(
-            package='rviz2',
-            executable='rviz2',
-            output='screen',
-            name='rviz_node',
-            parameters=[{'use_sim_time': True}],
-            arguments=['-d', rviz_config_dir])
+        package='rviz2',
+        executable='rviz2',
+        output='screen',
+        name='rviz_node',
+        parameters=[{'use_sim_time': True}],
+        arguments=['-d', rviz_config_dir])
 
     # --------------------------------------------------
     # ROS Gazebo Bridge
@@ -165,14 +139,55 @@ def generate_launch_description():
             "/tf" + "@tf2_msgs/msg/TFMessage" + "[gz.msgs.Pose_V",
             "/odom" + "@nav_msgs/msg/Odometry" + "[gz.msgs.Odometry",
             "/world/demo/model/barista_robot/joint_state" + "@sensor_msgs/msg/JointState" + "[gz.msgs.Model",
-            "/laser_scan" + "@sensor_msgs/msg/LaserScan" + "[gz.msgs.LaserScan",
         ],
         remappings=[
             ("/world/demo/model/barista_robot/joint_state", "/joint_states"),
+        ],
+        output="screen",
+    )
+ 
+    gz_bridge_laser = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        name="gz_bridge_laser",
+        condition=IfCondition(LaunchConfiguration("include_laser")),
+        arguments=[
+            "/laser_scan" + "@sensor_msgs/msg/LaserScan" + "[gz.msgs.LaserScan",
+        ],
+        remappings=[
             ("/laser_scan", "/scan"),
         ],
         output="screen",
     )
+
+
+    # --------------------------------------------------
+    # xacro processing + robot_state_publisher
+    # --------------------------------------------------
+
+    def launch_setup(context, *args, **kwargs):
+        include_laser_value = LaunchConfiguration("include_laser").perform(context)
+
+        xacro_file = os.path.join(
+            pkg_barista_robot_description, 'xacro', 'barista_robot_model.urdf.xacro'
+        )
+
+        robot_description_content = xacro.process_file(
+            xacro_file,
+            mappings={"include_laser": include_laser_value},
+        ).toxml()
+
+        params = {"robot_description": robot_description_content, "use_sim_time": True}
+
+        robot_state_publisher_node = Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            name='robot_state_publisher_node',
+            output="screen",
+            parameters=[params],
+        )
+
+        return [robot_state_publisher_node]
 
     # --------------------------------------------------
     # Launch description
@@ -180,13 +195,10 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
-
-            SetParameter(
-                name="use_sim_time",
-                value=True,
-            ),
+            SetParameter(name="use_sim_time", value=True),
 
             # Arguments
+            declare_include_laser,
             declare_spawn_model_name,
             declare_spawn_x,
             declare_spawn_y,
@@ -196,17 +208,17 @@ def generate_launch_description():
             # Simulator
             gz_sim,
 
-            # Robot description
-            robot_state_publisher_node,
+            # Robot description (deferred until include_laser is resolved)
+            OpaqueFunction(function=launch_setup),
 
             # Spawn robot
             delayed_spawn,
-            
+
             # Load rviz
             rviz_node,
 
             # Gazebo bridge
-            gz_bridge
-
+            gz_bridge,
+            gz_bridge_laser,
         ]
     )

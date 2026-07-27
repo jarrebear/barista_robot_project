@@ -1,11 +1,16 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="barista_bot">
 
+  <!-- Laser scanner -->
+  <xacro:arg name="include_laser" default="true"/>
+  <xacro:property name="include_laser" value="$(arg include_laser)"/>
+
   <xacro:include filename="$(find barista_robot_description)/xacro/inertia_calculations.xacro"/>
   <xacro:include filename="$(find barista_robot_description)/xacro/drive_wheel.xacro" />
   <xacro:include filename="$(find barista_robot_description)/xacro/caster_wheel.xacro" />
   <xacro:include filename="$(find barista_robot_description)/xacro/standoff_rod.xacro" />
   <xacro:include filename="$(find barista_robot_description)/xacro/cup_holder_tray.xacro" />
+  <xacro:include filename="$(find barista_robot_description)/xacro/laser_scanner.xacro" />
 
   <xacro:property name="body_radius" value="0.178"/>
   <xacro:property name="body_height" value="0.155"/>
