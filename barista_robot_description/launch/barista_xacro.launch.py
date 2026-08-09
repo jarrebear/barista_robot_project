@@ -22,10 +22,16 @@ def generate_launch_description():
         description="Whether to include the laser scanner in the robot description",
     )
 
-    declare_spawn_model_name = DeclareLaunchArgument(
-        "model_name",
+    declare_robot_color = DeclareLaunchArgument(
+        "robot_color",
+        default_value="blue",
+        description="Color of the robot, see .xacro file for details on which colors are available",
+    )
+
+    declare_spawn_robot_name = DeclareLaunchArgument(
+        "robot_name",
         default_value="barista_robot",
-        description="Model spawn name",
+        description="Robot spawn name",
     )
 
     declare_spawn_x = DeclareLaunchArgument(
@@ -92,13 +98,12 @@ def generate_launch_description():
         name="barista_robot_spawn",
         output="screen",
         arguments=[
-            "-name", LaunchConfiguration("model_name"),
+            "-name", LaunchConfiguration("robot_name"),
             "-allow_renaming", "true",
-            "-topic", "robot_description",
+            "-topic", ["/", LaunchConfiguration("robot_name"), "/robot_description"],
             "-x", LaunchConfiguration("x"),
             "-y", LaunchConfiguration("y"),
             "-z", LaunchConfiguration("z"),
-            "-Y", LaunchConfiguration("yaw"),
         ],
     )
 
@@ -126,68 +131,105 @@ def generate_launch_description():
         arguments=['-d', rviz_config_dir])
 
     # --------------------------------------------------
-    # ROS Gazebo Bridge
-    # --------------------------------------------------
-
-    gz_bridge = Node(
-        package="ros_gz_bridge",
-        executable="parameter_bridge",
-        name="gz_bridge",
-        arguments=[
-            "/clock" + "@rosgraph_msgs/msg/Clock" + "[gz.msgs.Clock",
-            "/cmd_vel" + "@geometry_msgs/msg/Twist" + "@gz.msgs.Twist",
-            "/tf" + "@tf2_msgs/msg/TFMessage" + "[gz.msgs.Pose_V",
-            "/odom" + "@nav_msgs/msg/Odometry" + "[gz.msgs.Odometry",
-            "/world/demo/model/barista_robot/joint_state" + "@sensor_msgs/msg/JointState" + "[gz.msgs.Model",
-        ],
-        remappings=[
-            ("/world/demo/model/barista_robot/joint_state", "/joint_states"),
-        ],
-        output="screen",
-    )
- 
-    gz_bridge_laser = Node(
-        package="ros_gz_bridge",
-        executable="parameter_bridge",
-        name="gz_bridge_laser",
-        condition=IfCondition(LaunchConfiguration("include_laser")),
-        arguments=[
-            "/laser_scan" + "@sensor_msgs/msg/LaserScan" + "[gz.msgs.LaserScan",
-        ],
-        remappings=[
-            ("/laser_scan", "/scan"),
-        ],
-        output="screen",
-    )
-
-
-    # --------------------------------------------------
     # xacro processing + robot_state_publisher
     # --------------------------------------------------
 
     def launch_setup(context, *args, **kwargs):
+
+        # Resolve launch arguments
+        robot_name_value = LaunchConfiguration("robot_name").perform(context)
+        robot_color_value = LaunchConfiguration("robot_color").perform(context)
         include_laser_value = LaunchConfiguration("include_laser").perform(context)
 
         xacro_file = os.path.join(
             pkg_barista_robot_description, 'xacro', 'barista_robot_model.urdf.xacro'
         )
 
+        # -----------------------------
+        # Generate robot description
+        # -----------------------------
+
         robot_description_content = xacro.process_file(
             xacro_file,
-            mappings={"include_laser": include_laser_value},
+            mappings={
+                "include_laser": include_laser_value,
+                "robot_color": robot_color_value,
+                "robot_name": robot_name_value,
+            },
         ).toxml()
 
-        params = {"robot_description": robot_description_content, "use_sim_time": True}
+        # -----------------------------
+        # Robot State Publisher
+        # -----------------------------
 
         robot_state_publisher_node = Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
             name='robot_state_publisher_node',
+            namespace=robot_name_value,
+            parameters=[{
+                "robot_description": robot_description_content,
+                "use_sim_time": True,
+                "frame_prefix": robot_name_value + "/",
+            }],
             output="screen",
-            parameters=[params],
         )
 
-        return [robot_state_publisher_node]
+        # -----------------------------
+        # Joint state bridge
+        # -----------------------------
+
+        joint_state_gz_topic = f"/{robot_name_value}/joint_states"
+
+        joint_state_ros_topic = (
+            f"/{robot_name_value}/joint_states"
+        )
+
+        gz_bridge = Node(
+            package="ros_gz_bridge",
+            executable="parameter_bridge",
+            name="gz_bridge",
+            arguments=[
+                "/clock" + "@rosgraph_msgs/msg/Clock" + "[gz.msgs.Clock",
+                f"/{robot_name_value}/cmd_vel" + "@geometry_msgs/msg/Twist" + "@gz.msgs.Twist",
+                "/tf" + "@tf2_msgs/msg/TFMessage" + "[gz.msgs.Pose_V",
+                f"/{robot_name_value}/odom" + "@nav_msgs/msg/Odometry" + "[gz.msgs.Odometry",
+
+                joint_state_gz_topic
+                    + "@sensor_msgs/msg/JointState"
+                    + "[gz.msgs.Model",
+            ],
+            remappings=[
+                (joint_state_gz_topic, joint_state_ros_topic),
+            ],
+            output="screen",
+        )
+
+        # Laser bridge
+        laser_gz_topic = f"/{robot_name_value}/laser_scan"
+        laser_ros_topic = f"/{robot_name_value}/scan"
+
+        gz_bridge_laser = Node(
+            package="ros_gz_bridge",
+            executable="parameter_bridge",
+            name="gz_bridge_laser",
+            condition=IfCondition(LaunchConfiguration("include_laser")),
+            arguments=[
+                laser_gz_topic
+                + "@sensor_msgs/msg/LaserScan"
+                + "[gz.msgs.LaserScan",
+            ],
+            remappings=[
+                (laser_gz_topic, laser_ros_topic),
+            ],
+            output="screen",
+        )
+
+        return [
+            robot_state_publisher_node,
+            gz_bridge,
+            gz_bridge_laser,
+        ]
 
     # --------------------------------------------------
     # Launch description
@@ -199,7 +241,8 @@ def generate_launch_description():
 
             # Arguments
             declare_include_laser,
-            declare_spawn_model_name,
+            declare_spawn_robot_name,
+            declare_robot_color,
             declare_spawn_x,
             declare_spawn_y,
             declare_spawn_z,
@@ -217,8 +260,5 @@ def generate_launch_description():
             # Load rviz
             rviz_node,
 
-            # Gazebo bridge
-            gz_bridge,
-            gz_bridge_laser,
         ]
     )

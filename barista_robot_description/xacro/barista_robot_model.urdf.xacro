@@ -1,9 +1,17 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="barista_bot">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="barista_robot">
 
   <!-- Laser scanner -->
   <xacro:arg name="include_laser" default="true"/>
   <xacro:property name="include_laser" value="$(arg include_laser)"/>
+
+  <!-- Robot color -->
+  <xacro:arg name="robot_color" default="blue"/>
+  <xacro:property name="robot_color" value="$(arg robot_color)"/>
+
+  <!-- Robot name -->
+  <xacro:arg name="robot_name" default="barista_bot"/>
+  <xacro:property name="robot_name" value="$(arg robot_name)"/>
 
   <xacro:include filename="$(find barista_robot_description)/xacro/inertia_calculations.xacro"/>
   <xacro:include filename="$(find barista_robot_description)/xacro/drive_wheel.xacro" />
@@ -59,7 +67,7 @@
       <geometry>
         <cylinder length="${body_height}" radius="${body_radius}"/>
       </geometry>
-      <material name="blue"/>
+      <material name="${robot_color}"/>
     </visual>
 
     <collision>
@@ -111,7 +119,7 @@
 
   <!-- Rear Caster Wheel -->
   <xacro:caster_wheel_macro
-      caster_wheel_name="rear"
+      caster_wheel_name="back"
       radius="${wheel_radius}"
       caster_color="green_dark"
       parent_link="main_body"
@@ -170,22 +178,38 @@
         <right_joint>joint_right_wheel</right_joint>
         <wheel_separation>0.316</wheel_separation>
         <wheel_radius>0.0352</wheel_radius>
-        <topic>cmd_vel</topic>
+        <topic>${robot_name}/cmd_vel</topic>
         <publish_odom>true</publish_odom>
         <publish_odom_tf>true</publish_odom_tf>
         <publish_wheel_tf>true</publish_wheel_tf>
-        <odom_topic>odom</odom_topic>
+        <odom_topic>${robot_name}/odom</odom_topic>
         <tf_topic>tf</tf_topic>
-        <frame_id>odom</frame_id>
-        <child_frame_id>base_link</child_frame_id>
+        <frame_id>${robot_name}/odom</frame_id>
+        <child_frame_id>${robot_name}/base_link</child_frame_id>
     </plugin>
   </gazebo>
 
   <!-- Joint state publisher plugin -->
   <gazebo>
     <plugin filename="gz-sim-joint-state-publisher-system"
+            name="gz::sim::systems::JointStatePublisher">
+        <topic>${robot_name}/joint_states</topic>
+        <update_rate>30</update_rate>
+        <!-- Publish the state of these joints -->
+        <joint_name>joint_left_wheel</joint_name>
+        <joint_name>joint_right_wheel</joint_name>
+        <joint_name>front_yaw_joint</joint_name>
+        <joint_name>back_yaw_joint</joint_name>
+        <joint_name>front_roll_joint</joint_name>
+        <joint_name>back_roll_joint</joint_name>
+        <joint_name>front_pitch_joint</joint_name>
+        <joint_name>back_pitch_joint</joint_name>
+    </plugin>
+  </gazebo>  
+  <!-- <gazebo>
+    <plugin filename="gz-sim-joint-state-publisher-system"
           name="gz::sim::systems::JointStatePublisher">
     </plugin>
-  </gazebo>
+  </gazebo> -->
 
 </robot>

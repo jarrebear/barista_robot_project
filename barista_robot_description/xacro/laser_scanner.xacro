@@ -53,11 +53,11 @@
     <gazebo reference="laser_scan_frame">
         <sensor type="gpu_lidar" name="gpu_lidar">
             <pose relative_to='laser_scan_frame'>0 0 0 0 0 0</pose>
-            <gz_frame_id>laser_scan_frame</gz_frame_id>
+            <gz_frame_id>${robot_name}/laser_scan_frame</gz_frame_id>
             <always_on>1</always_on>
             <visualize>true</visualize>
             <update_rate>100</update_rate>
-            <topic>laser_scan</topic>
+            <topic>${robot_name}/laser_scan</topic>
             <ray>
                 <scan>
                     <horizontal>
