@@ -3,14 +3,14 @@
 
   <xacro:include filename="$(find barista_robot_description)/xacro/inertia_calculations.xacro"/>
 
-  <xacro:macro name="cupholder_tray_macro" params="parent_link joint_xyz length radius mass">
+  <xacro:macro name="cupholder_tray_macro" params="parent_link joint_xyz length radius mass robot_color">
 
     <link name="cupholder_tray_link">
     <visual>
         <geometry>
         <cylinder length="${length}" radius="${radius}"/>
         </geometry>
-        <material name="blue"/>
+        <material name="${robot_color}"></material>
     </visual>
 
     <collision>

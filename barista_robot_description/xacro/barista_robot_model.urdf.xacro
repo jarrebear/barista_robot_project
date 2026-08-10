@@ -167,7 +167,8 @@
       length="${cupholder_tray_length}"
       mass="${cupholder_tray_mass}"
       parent_link="main_body"
-      joint_xyz="0 0 0.3425"/>
+      joint_xyz="0 0 0.3425"
+      robot_color="${robot_color}"/>
 
   <!-- Differential Drive Plugin -->
   <gazebo>
