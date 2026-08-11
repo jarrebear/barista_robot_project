@@ -12,6 +12,23 @@ find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
+
+# Create executable
+add_executable(robot_chase src/robot_chase.cpp)
+
+# Add dependencies
+ament_target_dependencies(robot_chase
+  rclcpp
+  geometry_msgs
+  tf2
+  tf2_geometry_msgs
+  )
+
+# Install executables
+install(TARGETS
+  robot_chase
+  DESTINATION lib/${PROJECT_NAME})
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
